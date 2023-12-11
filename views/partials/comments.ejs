@@ -1,0 +1,103 @@
+<div class="comments">    
+    <h1><i class="fa-solid fa-comments" style="color: #DDA0DD;"></i> Comments</h1>
+    <form style="display: inline;">
+        <textarea placeholder="Write a comment and press ENTER to send" maxlength="250" 
+            id="<%= article._id %>"></textarea>
+    </form>    
+    <hr />
+    <div id="comments-list">
+        <% comments.forEach(function(comment) { %>
+            <div class="comment">
+                <span class="user-picture">
+                    <img class="comment-picture" src="/uploads/<%= comment.user_id.picture %>" />
+                </span>
+                <span class="user-info">
+                    <%= comment.user_id.username %> <i><%= moment(comment.date).format("DD/MM/YYYY - hh:mm:ss") %></i>
+                </span>
+                <span class="user-comment">
+                    <%= comment.text %>
+                    <% if(comment.user_id._id.toString() === userID.toString()) { %>
+                        <a href="/comment/delete/<%= comment._id %>/1">
+                            <span class="delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </span>    
+                        </a>                        
+                    <% } %>
+                </span>
+            </div>
+        <% }) %>
+    </div>
+</div>
+
+<script>
+    
+    const textarea = document.querySelector('textarea')
+    const article_id = textarea.id
+    const user_id = '<%= locals.userID %>'
+    let num_comments = document.querySelector('#num_comments')    
+
+    textarea.addEventListener('keydown', async(e) => {
+        
+        if(e.keyCode === 13) {
+            e.preventDefault()
+            let text = textarea.value.trim()
+
+            if(text.trim() === '') {
+                return
+            }
+            else {
+                textarea.value = ""
+                const username = '<%= locals.user %>'
+                const picture = '<%= locals.picture %>'
+                try {
+                    const res = await fetch('/comment/make', {
+                        method: 'POST',
+                        body: JSON.stringify({text, user_id, article_id}),
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    const data = await res.json()
+                    if(data) {
+                        let comments = num_comments.innerHTML
+                        comments++
+                        num_comments.innerHTML = comments
+                        const div = document.createElement('div')
+                        div.classList.add("comment")
+                        const user_picture = document.createElement('span')
+                        const img = document.createElement('img')
+                        img.src = '/uploads/' + picture
+                        img.classList.add("comment-picture")
+                        img.setAttribute('z-index', 100)
+                        user_picture.appendChild(img)                        
+                        const info = document.createElement('span')
+                        info.classList.add('user-info')                        
+                        info.innerHTML = data.commentSaved.user_id.username                        
+                        info.innerHTML = info.innerHTML + ' ' + '<i>' + data.dataFormatted + '</i>'
+                        const comment = document.createElement('span')
+                        comment.classList.add('user-comment')
+                        comment.innerHTML = data.commentSaved.text
+                        const deletelink = document.createElement('a')                        
+                        const deleteicon = document.createElement("i")
+                        deleteicon.onclick = () => {
+                            window.location.href = '/comment/delete/' + data.commentSaved._id + "/1"
+                        }
+                        const spandelete = document.createElement("span")
+                        spandelete.classList.add("delete")
+                        deleteicon.classList.add("fa-solid", "fa-trash")
+                        spandelete.appendChild(deleteicon)
+                        comment.appendChild(spandelete)
+                        const lista = document.querySelector('#comments-list')
+                        div.appendChild(user_picture)
+                        div.appendChild(info)
+                        div.appendChild(comment)                        
+                        lista.prepend(div)
+                    }
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }  
+        }
+
+    })
+
+</script>

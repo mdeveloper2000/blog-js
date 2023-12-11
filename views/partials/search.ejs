@@ -1,0 +1,51 @@
+<div style="width: 80%; margin: 0 auto; margin-top: 20px;">
+    <input type="text" name="search" placeholder="Type the tag you want to search, e.g. Vue, VueJS, Node, NodeJS,"
+        style="width: 80%; margin-bottom: 0;" />
+    <button type="submit" id="searchbtn">
+        <i class="fa-solid fa-magnifying-glass"></i> Search
+    </button>
+    <div id="results" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+
+    const btn = document.querySelector('#searchbtn')
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault()
+        const search = document.querySelector('input').value
+        const res = await fetch('/articles/' + search, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            const data = await res.json()
+            const results = document.querySelector('#results')
+            results.innerHTML = ""
+            if(data.length > 0) {
+                data.forEach(article => {
+                    const link = document.createElement("a");
+                    link.href = `/article/${article._id}`
+                    const card = document.createElement('div')
+                    const ptitle = document.createElement("p")
+                    ptitle.innerHTML = article.title
+                    const content = document.createElement("p")
+                    content.innerHTML = `<i class="fa-solid fa-book-open-reader" style="color: #00f;"> ${article.views}</i>` +
+                    `   <i class="fa-solid fa-heart" style="color: #f00;"> ${article.likes}</i>` +
+                    `   <i class="fa-solid fa-comment" style="color: #f0f;"> ${article.comments}</i>`
+                    card.classList.add('cards-results')
+                    link.appendChild(card)
+                    card.appendChild(ptitle)
+                    card.appendChild(content)
+                    results.appendChild(link)
+                })
+            }
+            else {
+                const msg = document.createElement("div")
+                msg.classList.add("search-error")
+                const txt = document.createElement("p")
+                txt.innerHTML = "Your search returned no results. Try a different search"
+                msg.appendChild(txt)
+                results.appendChild(msg)
+            }
+    })
+
+</script>
