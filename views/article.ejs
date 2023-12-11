@@ -1,0 +1,67 @@
+<%- include("partials/header") -%>
+
+<div class="content">
+
+    <div class="card">
+        <img src="/<%= article.image %>" alt="article image" style="width:100%; height: 350px;" />
+        <h1><%= article.title %></h1>
+        <p class="article-content">
+            <%= article.content %>
+        </p>
+        <p style="text-align: center; margin-bottom: 30px;">
+            <% article.tags.split(',').forEach(tag => { %>
+                <span class="tag"><%= tag %></span>
+            <% }) %>
+        </p>
+        <p style="margin: 0 auto; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 18px;">
+            <%= moment(article.date).format("DD/MM/YYYY hh:mm:ss") %>
+        </p>
+        <div class="reactions">
+            <i class="fa-solid fa-book-open-reader" style="color: #00f;"></i> <span class="numbers"><%= article.views %></span>
+            <form style="display: inline;">
+                <a onclick='setLike("<%= article._id %>")'>
+                    <i class="<%= iliked === true ? 'fa-solid fa-heart liked' : 'fa-regular fa-heart' %>" id="icon"></i> <span class="numbers" id="num_likes"><%= article.likes %></span>
+                </a>
+            </form>
+            <i class="fa-solid fa-comment" style="color: #ff00ff;"></i> <span class="numbers" id="num_comments"><%= article.comments %></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function setLike(article_id) {
+        
+        const icon = document.querySelector('#icon')
+        let num_likes = document.querySelector('#num_likes')       
+
+        try {
+            const res = await fetch('/article/like/' + article_id, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            const data = await res.json()
+            if(data.liked) {
+                let likes = num_likes.innerHTML
+                likes++
+                num_likes.innerHTML = likes
+                icon.classList.remove("fa-regular", "fa-heart")
+                icon.classList.add("fa-solid", "fa-heart", "liked")
+            }
+            else if(!data.liked) {
+                let likes = num_likes.innerHTML
+                likes--
+                num_likes.innerHTML = likes
+                icon.classList.remove("fa-solid", "fa-heart", "liked")
+                icon.classList.add("fa-regular", "fa-heart")                
+            }
+        } 
+        catch (error) {
+            console.log(error)
+        }
+
+    }
+</script>
+
+<%- include("partials/comments") %>
+    
+<%- include("partials/footer") -%>

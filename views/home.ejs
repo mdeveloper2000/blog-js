@@ -1,0 +1,48 @@
+<%- include("partials/header") -%>
+
+<%- include("partials/search") %>
+
+<%- include("partials/menu") %>
+
+<div class="content">
+    <div style="display: flex;">
+        <div class="hero-image">
+            <div class="hero-text">
+              <h1>Welcome to BlogJS</h1>
+              <p>blogging and coding, now in Node :)</p>              
+            </div>
+            <img src="banner.jpg" />
+        </div>
+    </div>          
+        <div style="display: flex; justify-content: space-between;">
+            <% articles.forEach(function(article) { %>
+                <a href="/article/<%= article._id %>">        
+                    <div class="articles">
+                        <div class="header">
+                            <img src="/<%= article.image %>" width="300" height="300" />
+                        </div>
+                        <div class="body">
+                            <h3><i class="fa-solid fa-newspaper"></i> <%= article.title %></h3>
+                            <p style="text-align: justify; padding: 15px;">
+                                <%= article.preview %>... <b>(click to read article)</b>
+                            </p>
+                            <p>
+                                <% article.tags.split(',').forEach(tag => { %>
+                                    <span class="tag"><%= tag %></span>
+                                <% }) %>
+                            </p>
+                            <p><%= moment(article.date).format("DD/MM/YYYY hh:mm:ss") %></p>
+                        </div>
+                        <div class="bottom">
+                            <i class="fa-solid fa-book-open-reader" style="color: #00f;" title="Views"></i> <%= article.views %>
+                            <i class="fa-solid fa-heart liked"></i> <%= article.likes %>
+                            <i class="fa-solid fa-comment" style="color: #ff00ff;"></i> <%= article.comments %>
+                        </div>
+                    </div>
+                </a>
+            <% }) %>
+        </div>    
+</div>
+
+    
+<%- include("partials/footer") -%>

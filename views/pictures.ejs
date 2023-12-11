@@ -1,0 +1,45 @@
+<%- include("partials/header") -%>    
+
+<div class="content">
+    <form enctype="multipart/form-data" style="margin: 0 auto; padding: 0; align-items: center;">
+        <legend>Upload a picture</legend>
+        <input type="file" name="picture" id="picture" style="margin-bottom: 10px;" />
+        <img src="<%= picture %>" style="width: 400px; height: 300px; margin: 0 auto;" />                
+        <div class="picture error"></div>                
+        <button type="submit" name="upload" style="margin-top: 5px;">
+            <i class="fa-solid fa-upload"></i> Upload
+        </button>
+     </form>
+</div>
+
+<script>
+
+    const form = document.querySelector('form')    
+    
+    form.addEventListener('submit', async (e) => {
+        
+        e.preventDefault()        
+
+        const file = document.getElementById("picture")
+        const formData = new FormData()
+        formData.append("picture", file.files[0])
+
+        try {
+            const res = await fetch('/picture', {
+                method: 'POST',
+                body: formData                
+            })
+            const data = await res.json()
+            if(data === 'ok') {
+                window.location.href = '/pictures'
+            }
+        } 
+        catch (error) {
+            console.log(error)
+        }
+
+    })
+
+</script>
+    
+<%- include("partials/footer") -%>
